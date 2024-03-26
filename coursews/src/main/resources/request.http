@@ -1,0 +1,42 @@
+
+GET http://localhost:8080/coursews/courses
+Authorization: Bearer {{auth_token_fred}}
+
+###
+
+POST http://localhost:8080/coursews/course
+Authorization: Bearer {{auth_token_fred}}
+Content-type: application/json
+
+{
+  "title": "Physique",
+  "body": "Lois de newton",
+  "category": "Info",
+  "academicLevel": "l1",
+  "location": "Orléans"
+}
+
+###
+
+GET http://localhost:8080/coursews/course/606998cf8985df41acfe0e80
+
+###
+
+GET http://localhost:8080/coursews/courses?category=Science
+Authorization: Bearer {{auth_token_fred}}
+####
+
+
+DELETE http://localhost:8080/coursews/course/606b89c7bc2d322a1ecb7c90
+Authorization: Bearer {{auth_token_fred}}
+###
+
+GET http://localhost:8080/coursews/member/fred
+Authorization: Bearer {{auth_token_fred}}
+
+
+###
+ POST http://localhost:8080/coursews/member
+Authorization: Bearer {{auth_token_fred}}
+
+###

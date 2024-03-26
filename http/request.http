@@ -1,0 +1,188 @@
+#
+# INIT
+# 1/ créer un compte keycloak
+# 2/ se login (pour avoir le token)
+# 3/ créer un compte sur les ws
+#
+
+###
+# 1/ créer un compte keycloak
+POST http://localhost:8080/authws/sign-in
+Content-Type: application/json
+
+{
+  "username": "fred",
+  "password": "fred",
+  "firstname": "fred",
+  "lastname": "fred",
+  "email": "fred@fred.fred"
+}
+
+###
+# 1/ créer un compte keycloak
+POST http://localhost:8080/authws/sign-in
+Content-Type: application/json
+
+{
+  "username": "yoh",
+  "password": "yoh",
+  "firstname": "yoh",
+  "lastname": "yoh",
+  "email": "yoh@yoh.yoh"
+}
+
+###
+# 2/ LOGIN FRED (pour avoir le token)
+###
+POST http://localhost:8080/authws/login
+Content-Type: application/json
+
+{
+  "username": "fred",
+  "password": "fred"
+}
+
+> {% client.global.set("auth_token_fred", response.body["access_token"]); %}
+
+###
+# 2/ LOGIN YOH (pour avoir le token)
+###
+POST http://localhost:8080/authws/login
+Content-Type: application/json
+
+{
+  "username": "yoh",
+  "password": "yoh"
+}
+
+> {% client.global.set("auth_token_yoh", response.body["access_token"]); %}
+
+###
+# 3/ créer un compte FRED sur COMMUNITYWS
+POST http://localhost:8080/communityws/member
+Authorization: Bearer {{auth_token_fred}}
+
+###
+# 3/ créer un compte YOH sur COMMUNITYWS
+POST http://localhost:8080/communityws/member
+Authorization: Bearer {{auth_token_yoh}}
+
+###
+# 3/ créer un compte FRED sur COURSEWS
+POST http://localhost:8080/coursews/member
+Authorization: Bearer {{auth_token_fred}}
+
+###
+# 3/ créer un compte YOH sur COURSEWS
+POST http://localhost:8080/coursews/member
+Authorization: Bearer {{auth_token_yoh}}
+
+###
+### COMMUNITY WS
+###
+#Créer conversation entre fred et yoh
+POST http://localhost:8080/communityws/conversation
+Content-Type: application/json
+Authorization: Bearer {{auth_token_fred}}
+
+{
+  "members": [
+    {
+      "username": "yoh",
+      "firstname": "yoh",
+      "lastname": "yoh",
+      "email": "yoh@yoh.yoh"
+    },
+    {
+      "username": "fred",
+      "firstname": "fred",
+      "lastname": "fred",
+      "email": "fred@fred.fred"
+    }
+  ]
+}
+
+> {% client.global.set("id_conversation", response.body["_id"]); %}
+
+###
+#Fred envoie un message à Yoh
+POST http://localhost:8080/communityws/conversation/{{id_conversation}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token_fred}}
+
+{
+  "content": "Salut Yoh !"
+}
+
+###
+#Yoh répond à Fred
+POST http://localhost:8080/communityws/conversation/{{id_conversation}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token_yoh}}
+
+{
+  "content": "Hello Fred :)"
+}
+
+###
+#Yoh réccupère la conversation
+GET http://localhost:8080/communityws/conversation/{{id_conversation}}
+Authorization: Bearer {{auth_token_yoh}}
+
+###
+#Yoh réccupère son user avec la liste de ses conversations
+GET http://localhost:8080/communityws/member/yoh
+Authorization: Bearer {{auth_token_yoh}}
+
+###
+### COURSE WS
+###
+#Fred publie un cours
+POST http://localhost:8080/coursews/course
+Content-Type: application/json
+Authorization: Bearer {{auth_token_fred}}
+
+{
+  "title": "Il était une fois la vie",
+  "body": " Il y a 3,5 milliards d'années, apparaissait la première forme de vie : la cellule, capable de s'autorépliquer grâce à l'ADN. Dans le corps humain, une cellule est à la base de tout. C'est une véritable usine, avec ses fabriques de production, de gestion d'énergie, ses réserves, son centre de décision.",
+  "category": "SVT",
+  "academicLevel": "CE1",
+  "location": "Netflix"
+}
+
+> {% client.global.set("id_course", response.body["_id"]); %}
+
+###
+#Yoh cherche les cours de catégorie SVT
+GET http://localhost:8080/coursews/course?category=SVT
+Authorization: Bearer {{auth_token_yoh}}
+
+###
+#Yoh réccupère le cours
+GET http://localhost:8080/coursews/course/{{id_course}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token_yoh}}
+
+###
+#Yoh envoie un message à Fred
+POST http://localhost:8080/communityws/conversation/{{id_conversation}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token_yoh}}
+
+{
+  "content": "Trop cool ta fiche Fred, je vais vraiment apprendre plein de chose."
+}
+
+###
+#Fred modifie le titre de son cours
+PUT http://localhost:8080/coursews/course/{{id_course}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token_fred}}
+
+{
+  "title": "Il était une fois la vie - Episode 1",
+  "body": " Il y a 3,5 milliards d'années, apparaissait la première forme de vie : la cellule, capable de s'autorépliquer grâce à l'ADN. Dans le corps humain, une cellule est à la base de tout. C'est une véritable usine, avec ses fabriques de production, de gestion d'énergie, ses réserves, son centre de décision.",
+  "category": "SVT",
+  "academicLevel": "CE1",
+  "location": "Netflix"
+}
