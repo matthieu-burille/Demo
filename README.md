@@ -1,18 +1,8 @@
-# Application d'echange de cours 
-
-## Prerequies 
-
-- `java -version` :  14
-- `maven`
-- `docker`
-
-## Start command
-
-```bash
-> projet8/docker/start.sh
-```
-
-
-
-
-
+# Application avec une architecture microservices
+- Gateway
+- Netflix Consul
+- Authentification Keycloak
+- Spring security
+- API REST Spring Boot
+- PostgreSQL
+- MongoDB
